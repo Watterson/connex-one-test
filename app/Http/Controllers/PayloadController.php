@@ -7,19 +7,67 @@ use App\Rule;
 
 class PayloadController extends Controller
 {
-    public function handlePayload(Request $request)
+    public function analyse(Request $request)
     {
       $rules = Rule::all();
       $payload = $request->all();
-
+      foreach ($payload as $key => $data) {
+        foreach ($rules as $key => $rule) {
+          checkRule($data, $rule);
+        }
+      }
+      return;
     }
 
     public function checkRule($data, $rule)
     {
-      if(!$rule->min_call_length && !$rule->min_call_length){
+      if( $rule->receieve_all === true && $rule->recieve_sales === false && !$rule->campaign){
+        //route data to appropriate microservice based on $rule->microservice
+        return;
+      }else if( $rule->receieve_all === true && $rule->recieve_sales === true && !$rule->campaign){
+        if($data->query_type->title === 'SALE MADE'){
+          //route data to appropriate microservice based on $rule->microservice
+          return;
+        }else{
+          //data does not pass rules set and wont be sent to associated $rule->microservice
+          return;
+        }
+      }else if( $rule->receieve_all === true && $rule->recieve_sales === false && $rule->campaign){
+        if($data->campaign->name != $rule->campaign){
+          //route data to appropriate microservice based on $rule->microservice
 
-      }else if(!$rule->min_call_length && $rule->min_call_length){
+          return;
+        }else{
+         //data does not pass rules set and wont be sent to associated $rule->microservice
+          return;
+        }
+      }else if( $rule->receieve_all === true && $rule->recieve_sales === true && $rule->campaign){
+        if($data->campaign->name != $rule->campaign && $data->query_type->title === 'SALE MADE'){
+          //route data to appropriate microservice based on $rule->microservice
+          return;
+        }else{
+          //data does not pass rules set and wont be sent to associated $rule->microservice
+          return;
+        }
+      }else if( $rule->receieve_all === false && $rule->recieve_sales === false && !$rule->campaign){
+        //data does not pass rules set and wont be sent to associated $rule->microservice
+      }else if( $rule->receieve_all === false && $rule->recieve_sales === true && !$rule->campaign){
+        if($data->query_type->title === 'SALE MADE'){
+          //route data to appropriate microservice based on $rule->microservice
+          return;
+        }else{
+          //data does not pass rules set and wont be sent to associated $rule->microservice
+          return;
+        }
+      }else if( $rule->receieve_all === false && $rule->recieve_sales === false && $rule->campaign){
+        if($data->campaign->name != $rule->campaign){
+          //route data to appropriate microservice based on $rule->microservice
 
-      }else if($rule->min_call_length && !$rule->min_call_length)
+          return;
+        }else{
+         //data does not pass rules set and wont be sent to associated $rule->microservice
+          return;
+        }
+      }
     }
 }

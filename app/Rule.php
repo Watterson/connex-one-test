@@ -14,9 +14,8 @@ class Rule extends Model
   protected $fillable = [
       'microservice',
       'receieve_all',
-      'receieve_campaign',
-      'receieve_sales',
-      'min_call_length',
-      'min_call_length',
+      'campaign',
+      'recieve_sales',
+
   ];
 }
